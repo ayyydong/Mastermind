@@ -1,2 +1,2 @@
 # Mastermind
-Boardgame
+The Mastermind boardgame implemented using Prolog
