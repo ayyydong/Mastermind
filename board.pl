@@ -1,6 +1,10 @@
 % the gameboard 
 :- use_module(library(random)).
 
+% store value of game solution as key(List).  Will randomize for each new instance of swipl.
+:- table key/1. 
+key(List) :- randseq(4,6,List).
+
 % Initialize empty board
 initialize(gameBoard([
 	['_', '_', '_', '_', '_', '_', '_', '_', '_', '_'],
@@ -41,9 +45,10 @@ iShowLine([[X|X2]|XS],[X2|XS2]):- write(X), write(' '),
 uncoverAnswer(X,[H|T]):-
 	displayBoard(X, 0).
 
-mastermind:- initialize(X),
-	   randseq(4,6,List), 
+mastermind:- write('Guess the 4-digit key by typing: guess(N1,N2,N3,N4) where each N is a unique number from 1 to 6. Duplicates are not allowed.  The computer will return clues based on your guesses.  You have 10 guesses.'),
+	   initialize(X),
 	   displayBoard(X,10,List).
+     
 
 % nextMove(X, 10), !.
 
@@ -60,10 +65,15 @@ nextMove(X, Tries):-
 
 countcolor([],Count1):-
 write(Count1),
-write(' of your guessed color is in the answer').
+write(' of your guessed colors are in the answer').
+
+myList([1, 2, 3]).
+makeGreeting(Name) = Result :-
+    Result = string::format("Hello %!\n", Name).
 
 countcolor([H|T],Count1):-
-    exist(H),
+    key(List),
+    member(H, List),
     Count is Count1 + 1,
     countcolor(T,Count).
 countcolor([_|T],Count1):-
@@ -71,21 +81,13 @@ countcolor([_|T],Count1):-
 
 countcorrect([],Count1,_):-
     write(Count1),
-    write(' of your guessed color is at the right place').
+    write(' of your guessed colors are in the right place').
 countcorrect([H|T],Count1,Pos1):-
-    ans(Pos1,H),
+    key(List),
+    nth1(Pos1,List,H),
     Pos is Pos1 + 1,
     Count is Count1 + 1,
     countcorrect(T,Count,Pos).
 countcorrect([_|T],Count1,Pos1):-
     Pos is Pos1 + 1,
     countcorrect(T,Count1,Pos).
-
-ans(1,1).
-ans(2,2).
-ans(3,3).
-ans(4,4).
-exist(1).
-exist(2).
-exist(3).
-exist(4).
