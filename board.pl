@@ -193,7 +193,7 @@ readInnerChoice(K, D, M, Hints, Guesses, AIs) :-
 			)
 		; fail
 		)
-	; makeGreeting(D,M)
+	; makeGreeting(D,M, Guesses)
 	).
 
 % chosenSetting(D, M, Hints, Guesses, AIs).
