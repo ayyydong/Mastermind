@@ -78,9 +78,6 @@ makeGreeting(D, M, Guesses) :-
     readChoice(C, D, M, Hints, Guesses, AIs).
 
 readChoice(C, D, M, Hints, Guesses, AIs) :-
-	writeln(D),
-	writeln(M),
-	writeln(Guesses),
 	get_char(C),
 	(C == '1' -> 
 		writeln('\e[H\e[2J'),
