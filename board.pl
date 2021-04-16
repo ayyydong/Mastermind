@@ -15,16 +15,18 @@ initialize(8, gameBoard([
     ['_', '_', '_', '_', '_', '_', '_', '_']])).
 
 displayBoard(gameBoard(X), 0, List):- 
-	writeln("end"),
 	atomic_list_concat(List, ' ', FinalAtom),
 	atom_concat('   ',FinalAtom,A),
+	nl,
+	nl,
+	writeln("Solution: "),
 	write(A), 
 	nl,
 	show(X,10).
-displayBoard(gameBoard(X), N, List):- 
-	atomic_list_concat(List, ' ', FinalAtom),
-	atom_concat('   ',FinalAtom,A),
-	write(A), 
+displayBoard(gameBoard(X),_,_):- 
+	nl,
+	nl,
+	write('   ? ? ? ?'), 
 	nl,
 	show(X,10).
 
@@ -45,9 +47,6 @@ showLine(X,N,X2):- write(N), write('  '),
 showLineHelper([],_).
 showLineHelper([[X|X2]|XS],[X2|XS2]):- write(X), write(' '),
 			          showLineHelper(XS,XS2).
-
-uncoverAnswer(X, List):-
-	displayBoard(X, 0, List).
 
 mastermind:- 
 	makeGreeting(2,1,10),
@@ -216,28 +215,29 @@ chosenSetting(3, 1, 0, 8, NAI).
 chosenSetting(3, 2, 0, 10, AI).
 
 nextMove(X, 0, List):- 
-		uncoverAnswer(X, List),
+		% uncoverAnswer(X, List),
 		% updateBoard(X),
+		nl,
 		write('Bot wins!').
 nextMove(X, Tries, List):- 
 		nl,
 		write("Guesses left: "),
 		write(Tries),
 		nl,
-		writeln("Guess (Enter a sequence separated by commas): "),
+		writeln("Guess (Enter a sequence separated by commas eg.[A,B,C,D].): "),
 		read([A,B,C,D]),
 		(length([A,B,C,D],4) ->
 			guess((A,B,C,D),List,X,Tries)
 		; writeln("invalid")
 		).
 
-guess((A,B,C,D),List,X,Tries):- countcolor([A,B,C,D],0,List,Final),
+guess((A,B,C,D),List,X,Tries):- nl, nl, countcolor([A,B,C,D],0,List,Final),
 nl,
 countcorrect([A,B,C,D],0,1,List,FinalP),
 (Final == 4, FinalP == 4 -> 
 	nl,
 	writeln('You win!')
-;   Num is Tries-1, nextMove(X,Num,List), !
+;   Num is Tries-1, displayBoard(X,Num,List), nextMove(X,Num,List), !
 ).
 
 countcolor([],Count1,List,Final):-
