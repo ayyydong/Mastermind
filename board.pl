@@ -1,5 +1,6 @@
 % the gameboard 
 :- use_module(library(random)).
+:- style_check(-singleton). 
 
 % Initialize empty board
 initialize(10, gameBoard([
