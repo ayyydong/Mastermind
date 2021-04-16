@@ -215,14 +215,14 @@ chosenSetting(3, 1, 0, 8, NAI).
 % no hints, with AI, 10 guesses total (5 each)
 chosenSetting(3, 2, 0, 10, AI).
 
-guess((A,B,C,D),List):- countcolor([A,B,C,D],0,List),nl,countcorrect([A,B,C,D],0,1,List).
+guess((A,B,C,D),List):- countcolor([A,B,C,D],0,List),nl,countcorrect([A,B,C,D],0,1,List), checkwin([A,B,C,D],List).
 
 nextMove(X, 0, List):- 
 		uncoverAnswer(X, List),
 		updateBoard(X),
 		write('Bot wins!').
 nextMove(X, Tries, List):- 
-		writeln("Guess (Enter a sequence separated by commas): "),
+		writeln("Guess (Enter a sequence of the form '[A,B,C,D].'): "),
 		read([A,B,C,D]),
 		(length([A,B,C,D],4) ->
 			guess((A,B,C,D),List)
@@ -247,13 +247,14 @@ countcolor([_|T],Count1,List):-
 countcorrect([],Count1,_,List):-
     write(Count1),
     write(' of your guessed colors are in the right place').
-
+    
 countcorrect([H|T],Count1,Pos1,List):-
     nth1(Pos1,List,H),
     Pos is Pos1 + 1,
     Count is Count1 + 1,
     countcorrect(T,Count,Pos,List).
 
-countcorrect([_|T],Count1,Pos1,List):-
-    Pos is Pos1 + 1,
-    countcorrect(T,Count1,Pos,List).
+
+checkwin([A,B,C,D],List):-
+    [A,B,C,D]==List -> 
+    nl, write('You win!').
