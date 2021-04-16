@@ -215,45 +215,55 @@ chosenSetting(3, 1, 0, 8, NAI).
 % no hints, with AI, 10 guesses total (5 each)
 chosenSetting(3, 2, 0, 10, AI).
 
-guess((A,B,C,D),List):- countcolor([A,B,C,D],0,List),nl,countcorrect([A,B,C,D],0,1,List).
-
 nextMove(X, 0, List):- 
 		uncoverAnswer(X, List),
-		updateBoard(X),
+		% updateBoard(X),
 		write('Bot wins!').
 nextMove(X, Tries, List):- 
+		nl,
+		write("Guesses left: "),
+		write(Tries),
+		nl,
 		writeln("Guess (Enter a sequence separated by commas): "),
 		read([A,B,C,D]),
 		(length([A,B,C,D],4) ->
-			guess((A,B,C,D),List)
-			% nextMove(X, Num, List),
-			% Num is Tries-1
+			guess((A,B,C,D),List,X,Tries)
 		; writeln("invalid")
 		).
-		% write('You win!'),
 
-countcolor([],Count1,List):-
+guess((A,B,C,D),List,X,Tries):- countcolor([A,B,C,D],0,List,Final),
+nl,
+countcorrect([A,B,C,D],0,1,List,FinalP),
+(Final == 4, FinalP == 4 -> 
+	nl,
+	writeln('You win!')
+;   Num is Tries-1, nextMove(X,Num,List), !
+).
+
+countcolor([],Count1,List,Final):-
 	write(Count1),
+	Final is Count1,
 	write(' of your guessed colors are in the answer').
 
-countcolor([H|T],Count1,List):-
+countcolor([H|T],Count1,List,Final):-
     member(H, List),
     Count is Count1 + 1,
-    countcolor(T,Count,List).
+    countcolor(T,Count,List,Final).
 
-countcolor([_|T],Count1,List):-
-    countcolor(T,Count1,List).
+countcolor([_|T],Count1,List,Final):-
+    countcolor(T,Count1,List,Final).
 
-countcorrect([],Count1,_,List):-
+countcorrect([],Count1,_,List,FinalP):-
     write(Count1),
+    FinalP is Count1,
     write(' of your guessed colors are in the right place').
 
-countcorrect([H|T],Count1,Pos1,List):-
+countcorrect([H|T],Count1,Pos1,List,FinalP):-
     nth1(Pos1,List,H),
     Pos is Pos1 + 1,
     Count is Count1 + 1,
-    countcorrect(T,Count,Pos,List).
+    countcorrect(T,Count,Pos,List,FinalP).
 
-countcorrect([_|T],Count1,Pos1,List):-
+countcorrect([_|T],Count1,Pos1,List,FinalP):-
     Pos is Pos1 + 1,
-    countcorrect(T,Count1,Pos,List).
+    countcorrect(T,Count1,Pos,List,FinalP).
