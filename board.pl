@@ -46,14 +46,14 @@ showLineHelper([],_).
 showLineHelper([[X|X2]|XS],[X2|XS2]):- write(X), write(' '),
 			          showLineHelper(XS,XS2).
 
-uncoverAnswer(X,[H|T], List):-
+uncoverAnswer(X, List):-
 	displayBoard(X, 0, List).
 
 mastermind:- 
-	makeGreeting(2,1),
+	makeGreeting(2,1,10),
 	!.
      
-makeGreeting(D, M) :- 
+makeGreeting(D, M, Guesses) :- 
 	repeat,
     writeln('\e[H\e[2J'),
     writeln("			   █░█░█ █▀▀ █░░ █▀▀ █▀█ █▀▄▀█ █▀▀								"),
@@ -80,6 +80,7 @@ makeGreeting(D, M) :-
 readChoice(C, D, M, Hints, Guesses, AIs) :-
 	writeln(D),
 	writeln(M),
+	writeln(Guesses),
 	get_char(C),
 	(C == '1' -> 
 		writeln('\e[H\e[2J'),
@@ -120,11 +121,16 @@ readChoice(C, D, M, Hints, Guesses, AIs) :-
 		initialize(Guesses, X), 
 		randseq(4,6,List),
 		displayBoard(X,Guesses,List),
+		nextMove(X,Guesses,List),
 		!
 	; 	writeln("Not a valid input!"),
 		sleep(0.2),
 		fail
 	).
+
+associateRow(L,C):- atom_codes(L,[La|_]),
+			C is La - 65.
+		       % C is La - 65.
 
 readInnerChoice(K, D, M, Hints, Guesses, AIs) :-
 	get_char(K),
@@ -209,41 +215,45 @@ chosenSetting(3, 1, 0, 8, NAI).
 % no hints, with AI, 10 guesses total (5 each)
 chosenSetting(3, 2, 0, 10, AI).
 
-guess(A,B,C,D):- countcolor([A,B,C,D],0),nl,countcorrect([A,B,C,D],0,1).
+guess((A,B,C,D),List):- countcolor([A,B,C,D],0,List),nl,countcorrect([A,B,C,D],0,1,List).
 
-nextMove(X, 0):- triesleft(X),
+nextMove(X, 0, List):- 
+		uncoverAnswer(X, List),
 		updateBoard(X),
 		write('Bot wins!').
-nextMove(X, Tries):- 
-		guess(A,B,C,D), 
-		nextMove(X, Num),
-		write('You win!'),
-		Num is Tries-1.
+nextMove(X, Tries, List):- 
+		writeln("Guess (Enter a sequence separated by commas): "),
+		read([A,B,C,D]),
+		(length([A,B,C,D],4) ->
+			guess((A,B,C,D),List)
+			% nextMove(X, Num, List),
+			% Num is Tries-1
+		; writeln("invalid")
+		).
+		% write('You win!'),
 
-countcolor([],Count1):-
+countcolor([],Count1,List):-
 	write(Count1),
 	write(' of your guessed colors are in the answer').
 
-countcolor([H|T],Count1):-
-    key(List),
+countcolor([H|T],Count1,List):-
     member(H, List),
     Count is Count1 + 1,
-    countcolor(T,Count).
+    countcolor(T,Count,List).
 
-countcolor([_|T],Count1):-
-    countcolor(T,Count1).
+countcolor([_|T],Count1,List):-
+    countcolor(T,Count1,List).
 
-countcorrect([],Count1,_):-
+countcorrect([],Count1,_,List):-
     write(Count1),
     write(' of your guessed colors are in the right place').
 
-countcorrect([H|T],Count1,Pos1):-
-    key(List),
+countcorrect([H|T],Count1,Pos1,List):-
     nth1(Pos1,List,H),
     Pos is Pos1 + 1,
     Count is Count1 + 1,
-    countcorrect(T,Count,Pos).
+    countcorrect(T,Count,Pos,List).
 
-countcorrect([_|T],Count1,Pos1):-
+countcorrect([_|T],Count1,Pos1,List):-
     Pos is Pos1 + 1,
-    countcorrect(T,Count1,Pos).
+    countcorrect(T,Count1,Pos,List).
