@@ -38,13 +38,13 @@ show(X,N):-
 	Ns is N-1,
     show(X2,Ns).
 
-%showLine(X,N,X2) writes N and shows first line of board X (first element of every column). X2 is X without the shown line.
+% showLine(X,N,X2) writes N and shows first line of board X (first element of every column). X2 is X without the shown line.
 showLine(X,N,X2):- N >= 10, write(N), write(' '), 
 		showLineHelper(X,X2), nl.
 showLine(X,N,X2):- write(N), write('  '),
 		showLineHelper(X,X2), nl.
 
-%showLineHelper(X,X2) writes first element of every column. X2 is X without the shown line.
+% showLineHelper(X,X2) writes first element of every column. X2 is X without the shown line.
 showLineHelper([],_).
 showLineHelper([[X|X2]|XS],[X2|XS2]):- write(X), write(' '),
 			          showLineHelper(XS,XS2).
@@ -241,6 +241,7 @@ countcorrect([A,B,C,D],0,1,List,FinalP),
 ;   Num is Tries-1, displayBoard(X,Num,List), nextMove(X,Num,List), !
 ).
 
+% countcolor calculate how many color in the guess exist in the answer
 countcolor([],Count1,List,Final):-
 	write(Count1),
 	Final is Count1,
@@ -254,6 +255,7 @@ countcolor([H|T],Count1,List,Final):-
 countcolor([_|T],Count1,List,Final):-
     countcolor(T,Count1,List,Final).
 
+% countcorrect calculate how many color in the guess is at correct position in the answer
 countcorrect([],Count1,_,List,FinalP):-
     write(Count1),
     FinalP is Count1,
